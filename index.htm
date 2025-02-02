@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Chatbot Styles */
+        .chatbot {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chatbot-header {
+            background: #6B46C1;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .chatbot-messages {
+            height: 250px;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chatbot-input {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+        }
+        .chatbot-input button {
+            background: #6B46C1;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #6B46C1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+        .user-message, .bot-message {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .user-message {
+            background: #E9D8FD;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background: #E2E8F0;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-purple-700 text-white py-4 px-6 flex justify-between items-center">
+        <h1 class="text-3xl font-bold" style="font-family: 'Dancing Script', cursive;">MyLibrary</h1>
+        <ul class="flex space-x-6">
+            <li><a href="index.htm" class="hover:underline">Home</a></li>
+            <li><a href="about.htm" class="hover:underline">About</a></li>
+            <li><a href="collections.htm" class="hover:underline">Collections</a></li>
+            <li><a href="add.htm" class="hover:underline">Add Book</a></li>
+            <li><a href="contact.htm" class="hover:underline">Contact</a></li>
+            <li><a href="login.htm" class="hover:underline">Login/Signup</a></li>
+        </ul>
+    </nav>
+
+    <!-- Header -->
+    <header class="h-screen flex flex-col items-center justify-center text-center px-4">
+        <h2 class="text-5xl font-extrabold text-gray-800">Welcome to Our Digital Library</h2>
+        <p class="text-lg text-gray-600 mt-4">Access a vast collection of books, research papers, and articles online.</p>
+        <a href="collections.htm" class="mt-6 bg-purple-700 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-purple-800">Explore Now</a>
+    </header>
+
+    <!-- Collections Section -->
+    <section class="py-12 px-6 text-center">
+        <h3 class="text-3xl font-bold text-gray-800">Our Collections</h3>
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 shadow-md rounded-lg cursor-pointer">
+                <h4 class="text-xl font-semibold text-gray-700">E-Books</h4>
+                <p class="text-gray-600 mt-2">Browse through a vast collection of digital books on various topics.</p>
+            </div>
+            <div class="bg-white p-6 shadow-md rounded-lg cursor-pointer" >
+                <h4 class="text-xl font-semibold text-gray-700">Research Papers</h4>
+                <p class="text-gray-600 mt-2">Access scholarly articles and research papers from renowned journals.</p>
+            </div>
+            <div class="bg-white p-6 shadow-md rounded-lg cursor-pointer">
+                <h4 class="text-xl font-semibold text-gray-700">Historical Archives</h4>
+                <p class="text-gray-600 mt-2">Explore digitized historical documents and rare manuscripts.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-purple-700 text-white text-center py-6 mt-12">
+        <p>&copy; 2025 MyLibrary. All rights reserved.</p>
+    </footer>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-toggle" onclick="toggleChatbot()">Chat 💬</button>
+
+    <!-- Chatbot Window -->
+    <div class="chatbot" id="chatbot">
+        <div class="chatbot-header">Library Assistant 🤖</div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="bot-message">Hi! I'm here to help you. Ask me about our library. 📚</div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbotInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Toggle chatbot visibility
+        function toggleChatbot() {
+            const chatbot = document.getElementById("chatbot");
+            chatbot.style.display = chatbot.style.display === "flex" ? "none" : "flex";
+        }
+
+        // Handle Enter key press
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+
+        // Send user message and get bot response
+        function sendMessage() {
+            const inputField = document.getElementById("chatbotInput");
+            const message = inputField.value.trim();
+            if (message === "") return;
+
+            const messagesContainer = document.getElementById("chatbotMessages");
+
+            // Add user message
+            const userMessage = document.createElement("div");
+            userMessage.className = "user-message";
+            userMessage.innerText = message;
+            messagesContainer.appendChild(userMessage);
+
+            // Auto-scroll to the latest message
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Get chatbot response
+            const response = getBotResponse(message);
+
+            // Add bot message after a short delay
+            setTimeout(() => {
+                const botMessage = document.createElement("div");
+                botMessage.className = "bot-message";
+                botMessage.innerText = response;
+                messagesContainer.appendChild(botMessage);
+
+                // Auto-scroll again
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 500);
+
+            // Clear input field
+            inputField.value = "";
+        }
+
+        // Generate bot response
+        function getBotResponse(input) {
+            const text = input.toLowerCase();
+
+            // Simple chatbot responses
+            if (text.includes("hello") || text.includes("hi")) {
+                return "Hello! How can I assist you today?";
+            } else if (text.includes("collections") || text.includes("books")) {
+                return "You can explore our book collection in the 'Collections' section.";
+            } else if (text.includes("about")) {
+                return "MyLibrary is a digital library offering a vast collection of books.";
+            } else if (text.includes("contact")) {
+                return "You can reach us through the 'Contact' page.";
+            } else if (text.includes("help") || text.includes("features")) {
+                return "I can help you find books, navigate the website, and answer library-related queries.";
+            } else {
+                return "I'm not sure about that. Try asking about 'collections', 'contact', or 'features'.";
+            }
+        }
+    </script>
+</body>
+</html>
